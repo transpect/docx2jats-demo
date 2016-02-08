@@ -12,9 +12,8 @@
   <nextCatalog catalog="../jats2html/xmlcatalog/catalog.xml"/>
   <nextCatalog catalog="../evolve-hub/xmlcatalog/catalog.xml"/>
   <nextCatalog catalog="../schema/Hub/xmlcatalog/catalog.xml"/>
-  <nextCatalog catalog="../schema/xhtml1/xmlcatalog/catalog.xml"/>
+  <nextCatalog catalog="../schema/html/xhtml1/xmlcatalog/catalog.xml"/>
   <nextCatalog catalog="../schema/jats/xmlcatalog/catalog.xml"/>
-  <nextCatalog catalog="../schema/iso-schematron/catalog.xml"/>
   <nextCatalog catalog="../xslt-util/xmlcatalog/catalog.xml"/>
   <nextCatalog catalog="../docx2hub/xmlcatalog/catalog.xml"/>
   
