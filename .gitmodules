@@ -1,0 +1,48 @@
+[submodule "calabash"]
+	path = calabash
+	url = https://github.com/transpect/calabash-frontend.git
+[submodule "schema/hub"]
+	path = schema/hub
+	url = https://github.com/le-tex/Hub.git
+[submodule "docx2hub"]
+	path = docx2hub
+	url = https://github.com/transpect/docx2hub
+[submodule "schema/jats"]
+	path = schema/jats
+	url = https://github.com/transpect/schema-jats
+[submodule "schema/html"]
+	path = schema/html
+	url = https://github.com/transpect/schema-html
+[submodule "evolve-hub"]
+	path = evolve-hub
+	url = https://github.com/transpect/evolve-hub.git
+[submodule "hub2html"]
+	path = hub2html
+	url = https://github.com/transpect/hub2html.git
+[submodule "hub2jats"]
+	path = hub2jats
+	url = https://github.com/transpect/hub2bits.git
+[submodule "jats2html"]
+	path = jats2html
+	url = https://github.com/transpect/jats2html.git
+[submodule "cascade"]
+	path = cascade
+	url = https://github.com/transpect/cascade.git
+[submodule "xslt-util"]
+	path = xslt-util
+	url = https://github.com/transpect/xslt-util.git
+[submodule "xproc-util"]
+	path = xproc-util
+	url = https://github.com/transpect/xproc-util.git
+[submodule "htmlreports"]
+	path = htmlreports
+	url = https://github.com/transpect/htmlreports.git
+[submodule "schematron"]
+	path = schematron
+	url = https://github.com/transpect/schematron.git
+[submodule "epubtools"]
+	path = epubtools
+	url = https://github.com/transpect/epubtools.git
+[submodule "epubcheck-idpf"]
+	path = epubcheck-idpf
+	url = https://github.com/transpect/epubcheck-idpf.git
