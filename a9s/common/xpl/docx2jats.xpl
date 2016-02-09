@@ -11,12 +11,17 @@
   xmlns:hub2htm="http://transpect.io/hub2htm"
   xmlns:hub="http://transpect.io/hub" name="docx2epub" version="1.0">
 
+  <p:input port="conf">
+    <p:document href="http://this.transpect.io/conf/transpect-conf.xml"/>
+  </p:input>
+
   <p:output port="result" primary="true">
     <p:documentation>JATS</p:documentation>
   </p:output>
   <p:serialization port="result" indent="true"/>
 
   <p:option name="file" required="true"/>
+  <p:option name="clades" select="''"/>
 
   <p:option name="debug" select="'yes'"/>
   <p:option name="debug-dir-uri" select="'debug'"/>
@@ -25,11 +30,31 @@
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
   <p:import href="http://transpect.io/docx2hub/xpl/docx2hub.xpl"/>
   <p:import href="http://transpect.io/xproc-util/store-debug/xpl/store-debug.xpl"/>
+  <p:import href="http://transpect.io/cascade/xpl/paths.xpl"/>
   <p:import href="http://transpect.io/evolve-hub/xpl/evolve-hub.xpl"/>
   <p:import href="http://transpect.io/hub2bits/xpl/hub2bits.xpl"/>
   <p:import href="http://transpect.io/jats2html/xpl/jats2html.xpl"/>
   <p:import href="http://transpect.io/xproc-util/remove-ns-decl-and-xml-base/xpl/remove-ns-decl-and-xml-base.xpl"/> 
  
+  <p:load>
+    <p:with-option name="href" select="/tr:conf/@paths-xsl-uri">
+      <p:pipe port="conf" step="docx2epub"/>
+    </p:with-option>
+  </p:load>
+
+  <tr:paths name="paths" pipeline="docx2jats.xpl">
+    <p:with-option name="clades" select="$clades"/>
+    <p:with-option name="file" select="$file"/>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+    <p:input port="conf">
+      <p:pipe port="conf" step="docx2epub"/>
+    </p:input>
+  </tr:paths>
+
+  <p:sink/>
+
   <docx2hub:convert name="docx2hub" srcpaths="yes" unwrap-tooltip-links="yes">
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
@@ -39,7 +64,7 @@
 
   <hub:evolve-hub name="evolve-hub-dyn" srcpaths="yes" load="evolve-hub/driver">
     <p:input port="paths">
-      <p:empty/>
+      <p:pipe port="result" step="paths"/>
     </p:input>
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
@@ -49,7 +74,7 @@
   <jats:hub2bits name="hub2jats" load="hub2jats/hub2jats-driver" 
     fallback-xsl="http://transpect.io/hub2bits/xsl/hub2jats-fallback.xsl">
     <p:input port="paths">
-      <p:empty/>
+      <p:pipe port="result" step="paths"/>
     </p:input>
     <p:input port="models">
       <p:inline>

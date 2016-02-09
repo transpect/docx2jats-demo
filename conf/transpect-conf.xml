@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://transpect.io/cascade/schema/cascade.rng"?>
+<?xml-model href="http://transpect.io/cascade/schema/cascade.rng" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<conf xmlns="http://transpect.io"
+  content-base-uri="http://ulsp.eu/content-repo/" 
+  paths-xsl-uri="http://this.transpect.io/a9s/common/xsl/paths.xsl">
+  <cascade>
+    <reserved name="css"/>
+    <reserved name="epubtools"/>
+    <reserved name="evolve-hub"/>
+    <reserved name="fonts"/>
+    <reserved name="htmlreports"/>
+    <reserved name="htmltemplates"/>
+    <reserved name="hub2html"/>
+    <reserved name="hub2tei"/>
+    <reserved name="metadata"/>
+    <reserved name="resource"/>
+    <reserved name="schematron"/>
+    <reserved name="styles"/>
+    <reserved name="tei2html"/>
+    <reserved name="xpl"/>
+    <reserved name="xsl"/>
+    <clade role="publisher" name="ulsp">
+      <param name="publisher-prefix-for-style-mapping" value="ulsp"/> 
+      <clade role="journal" name="CSMI">
+        <content role="ms" name-regex="^CSMI_\d{4}_\d{3}$"/><!-- YYYY_MSN -->
+      </clade>
+       <clade role="journal" name="Test">
+        <content role="ms" name-regex="^Test_\d{4}_\d{3}$"/><!-- YYYY_MSN -->
+      </clade>
+    </clade>
+  </cascade>
+</conf>
