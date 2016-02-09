@@ -18,4 +18,5 @@
   <nextCatalog catalog="../docx2hub/xmlcatalog/catalog.xml"/>
   
   <nextCatalog catalog="content-repo.catalog.xml"/>
+  <nextCatalog catalog="content-repo.default.catalog.xml"/>
 </catalog>
