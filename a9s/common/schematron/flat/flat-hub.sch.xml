@@ -1,32 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://purl.oclc.org/dsdl/schematron" 
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:transpect="http://www.le-tex.de/namespace/transpect"  
+  xmlns:tr="http://transpect.io"  
   queryBinding="xslt2">
 
   <ns prefix="idml2xml" uri="http://www.le-tex.de/namespace/idml2xml" />
   <ns prefix="dbk" uri="http://docbook.org/ns/docbook" />
   <ns prefix="css" uri="http://www.w3.org/1996/css"/>
-  <ns prefix="hub" uri="http://www.le-tex.de/namespace/hub" />
-  <ns prefix="tei" uri="http://www.tei-c.org/ns/1.0" />
-  <ns prefix="transpect" uri="http://www.le-tex.de/namespace/transpect" />
+  <ns prefix="hub" uri="http://transpect.io/hub" />
+  <ns prefix="tr" uri="http://transpect.io" />
  
   <let name="base-dir" value="/*/dbk:info/dbk:keywordset[@role eq 'hub']/dbk:keyword[@role eq 'source-dir-uri']"/>
-  <let name="fake-table-invisible-footnote" value="'Tabellenfussnote_ZifferUnsichbar'"/>
-  <let name="fake-table-manual-footnote-in-table" value="'Tabellenfussnote_unecht'"/>
   <ns prefix="schematron" uri="http://purl.oclc.org/dsdl/schematron" />
+   
+   <pattern id="flat-hub_tabs">
+    <rule context="dbk:tab[not(parent::dbk:tabs)]">
+      <let name="srcpaths" value="string-join(
+                                    for $s in tokenize(
+                                      (@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1],
+                                      '\s+'
+                                    ) 
+                                    return concat($base-dir, $s),
+                                    ' '
+                                  )"/>
+      <report test="exists(
+                      preceding-sibling::node()[self::dbk:phrase[not(@role = 'hub:identifier')] 
+                                                or (self::text() and matches(., '\S'))]
+                    ) 
+                    and exists(following-sibling::node()[self::dbk:phrase or self::text()])" 
+              role="warning" 
+              diagnostics="tabs_within_line_de" id="tabs_within_line">
+        <span class="srcpath"><xsl:value-of select="$srcpaths"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Tab in para</span>
+        This tab is located within a paragraph (not as first element for indentation reasons). Please check whether it is correctly processed. Tabs are only allowed in special paragraphs such as headings, 
+        lists etc. where they are specially processed and create new XML elements.
+      </report>
+    </rule>
+   </pattern>
   
   <pattern id="flat-hub_multi_para_heading">  
-    <rule context="dbk:para[matches(@role, 'Headline-3')][not(matches(., '^\s*$'))]">
+    <rule context="dbk:para[matches(@role, 'Headline')][not(matches(., '^\s*$'))]">
       <let name="role" value="replace(@role, '^(.+?)(_-_.+)?$', '$1')"/>
-      <report test="replace(following-sibling::*[1]/self::dbk:para/@role, '^(.+?)(_-_.+)?$', '$1') = $role" id="multi_para_heading" role="error"
-        > <!--  diagnostics="multi_para_heading_de" -->
+      <report test="replace(following-sibling::*[1]/self::dbk:para/@role, '^(.+?)(_-_.+)?$', '$1') = $role" id="multi_para_heading" role="error">
         <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath, ' ', $base-dir, following-sibling::*[1]/@srcpath)"/></span>
         <span class="category">Typesetting convention</span>
         <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Multiple paragraph heading</span>
         If this is a heading with more than one paragraphs please use a linebreak instead of a newline. Otherwise two headings are created.</report>
     </rule>
   </pattern>
+  
+   <pattern id="typo_space">
+    <rule context="*[some $t in text() satisfies (matches($t, '(\w*|\d*)\s(=)\s(\w?|\d?|$)'))]">
+      <let name="space" value="."/>
+      <let name="srcpaths" value="for $sp in tokenize((@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1], '\s+')
+        return concat($base-dir, $sp)"/>
+      <report test="true()" role="warning" id="breaking_space" diagnostics="breaking_space_de">
+        <span class="srcpath"><xsl:value-of select="$srcpaths"/></span>
+        <span class="category">Typography</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Breaking Space</span>
+        This phrase and number should probably not break. <xsl:value-of select="$space"/> 
+        Please use non-breaking-space.</report>
+    </rule>
+  </pattern>
+  
+  
   <diagnostics>
   <diagnostic id="multi_para_heading_de" xml:lang="de">
     <span class="category">Satzkonventionen</span>
@@ -38,5 +76,16 @@
     Falls es sich um verschiedene Überschriftenbestandteile handelt, wie Untertitel, Autor oder eine alleinstehende Kapitelnummer, 
     sollte unbedingt auf die dafür zur Verfügung gestellten Formate zurückgegriffen werden.
   </diagnostic>
+    <diagnostic id="tabs_within_line_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Tabulator in Absatz</span>
+      In diesem Absatz wurde ein Tabulator verwendet. Tabulatoren können generell im XML und EPUB nicht wie im Satzprogramm wiedergegeben werden. 
+      In einigen Absatztypen wie Überschriften, Listen, Glossaren etc. kann mit Tabulatoren gearbeitet werden, da dieser den Absatz dann in neue Elemente unterteilt. Z.B. in Glossarbegriff und Glossarerklärung.
+    </diagnostic>
+    <diagnostic id="breaking_space_de" xml:lang="de">
+      <span class="category">Typografie</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Leerzeichen</span>
+      Dieser Ausdruck soll wahrscheinlich nicht umbrochen werden. <xsl:value-of select="$space"/> 
+      Bitte ein non-breaking-space nutzen.</diagnostic>
   </diagnostics>
 </schema>

@@ -36,14 +36,14 @@
     <xsl:variable name="source-basename" select="dbk:keywordset[@role eq 'hub']/dbk:keyword[matches(@role, 'source-basename')]"/>
     <journal-meta>
       <journal-id journal-id-type="nlm-ta">
-        <xsl:value-of select="replace($source-basename, '(^\w+)(_\d+_\d+)' , '$1')"/>
+        <xsl:value-of select="replace($source-basename, '(^\w+)(_\d+_\d+)\w?' , '$1')"/>
       </journal-id>
       <journal-title-group>
-      <xsl:if test="matches(replace($source-basename, '(^\w+)(_\d+_\d+)' , '$1'), 'CSMI')">
+      <xsl:if test="matches(replace($source-basename, '(^\w+)(_\d+_\d+)\w?' , '$1'), 'CSMI')">
         <journal-title>Clinical Sports Medicine International</journal-title>
       </xsl:if>
       </journal-title-group>
-      <xsl:if test="matches(replace($source-basename, '(^\w+)(_\d+_\d+)' , '$1'), 'CSMI')">
+      <xsl:if test="matches(replace($source-basename, '(^\w+)(_\d+_\d+)\w?' , '$1'), 'CSMI')">
         <issn pub-type="ppub">1617-9870</issn>
       </xsl:if>
     </journal-meta>
@@ -83,14 +83,14 @@
       </xsl:if>
       <pub-date pub-type="ppub">
         <year>
-          <xsl:value-of select="replace($source-basename, '(^\w+)_(\d+)_(\d+)' , '$2')"/>
+          <xsl:value-of select="replace($source-basename, '(^\w+)_(\d+)_(\d+)\w?' , '$2')"/>
         </year>
       </pub-date>
       <volume>
-        <xsl:value-of select="replace($source-basename, '(^\w+)_(\d+)_(\d)0(\d)' , '$3')"/>
+        <xsl:value-of select="replace($source-basename, '(^\w+)_(\d+)_(\d)0(\d)\w?' , '$3')"/>
       </volume>
       <issue>
-        <xsl:value-of select="replace($source-basename, '(^\w+)_(\d+)_(\d)0(\d)' , '$4')"/>
+        <xsl:value-of select="replace($source-basename, '(^\w+)_(\d+)_(\d)0(\d)\w?' , '$4')"/>
       </issue>
       <fpage>
         <xsl:value-of select="replace(dbk:abstract/dbk:para[matches(@role, 'quotation')], '(^.*):\s*(\d+)-(\d+)[\s\S]?', '$2')"/></fpage>
@@ -555,8 +555,6 @@
   </xsl:template>
 
   <xsl:template match="dbk:phrase[matches(@role, 'tab')]" mode="default">
-    <xsl:message select="'text', text()"/>
-    <xsl:message select="'replace', replace(text(), '[Tt]able\s*(\d*)', '$1')"/>
     <xsl:for-each select="tokenize(replace(text(), '^[Tt]able\s*(\d*)', '$1'), ',')">
       <xref ref-type="table" rid="{concat('Tab',normalize-space(current()))}">
         <xsl:value-of select="concat('Table ', normalize-space(current()))"/>
@@ -582,13 +580,7 @@
     </xsl:element>
   </xsl:template>
 
-  <!-- Override in adaptions -->
   <xsl:template match="dbk:imagedata/@fileref" mode="default">
     <xsl:attribute name="xlink:href" select="."/>
   </xsl:template>
-  <!--
-<xsl:template match="@srcpath" mode="test" priority="10">
-  <xsl:message select="'öööööööööööö ' , ancestor::*[1]/local-name()"/>
-</xsl:template>-->
-
-</xsl:stylesheet>
+  </xsl:stylesheet>

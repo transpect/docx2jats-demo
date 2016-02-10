@@ -7,7 +7,7 @@
   <xsl:import href="http://transpect.io/cascade/xsl/paths.xsl"/>
   <xsl:param name="filenames" as="xs:string?"/>
   <!-- that param is for filenames like images -->
-  <xsl:variable name="regex" select="'^((\p{L}+)_(\d{4})_(\d{3})).*$'" as="xs:string"/>
+  <xsl:variable name="regex" select="'^((\p{L}+)_(\d{4})_(\d{3})(\p{L}?)).*$'" as="xs:string"/>
   
   <xsl:function name="tr:parse-file-name" as="attribute(*)*">
     <xsl:param name="filename" as="xs:string?"/>

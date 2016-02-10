@@ -23,10 +23,10 @@
     <clade role="publisher" name="ulsp">
       <param name="publisher-prefix-for-style-mapping" value="ulsp"/> 
       <clade role="journal" name="CSMI">
-        <content role="ms" name-regex="^CSMI_\d{4}_\d{3}$"/><!-- YYYY_MSN -->
+        <content role="ms" name-regex="^CSMI_\d{4}_\d{3}\p{L}?$"/><!-- YYYY_MSN -->
       </clade>
        <clade role="journal" name="Test">
-        <content role="ms" name-regex="^Test_\d{4}_\d{3}$"/><!-- YYYY_MSN -->
+        <content role="ms" name-regex="^Test_\d{4}_\d{3}\p{L}?$"/><!-- YYYY_MSN -->
       </clade>
     </clade>
   </cascade>
