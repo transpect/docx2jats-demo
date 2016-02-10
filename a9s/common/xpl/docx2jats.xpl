@@ -18,7 +18,7 @@
   <p:output port="result" primary="true">
     <p:documentation>JATS</p:documentation>
   </p:output>
-  <p:serialization port="result" indent="true"/>
+  <p:serialization port="result" indent="true" omit-xml-declaration="false"/>
 
   <p:option name="file" required="true"/>
   <p:option name="clades" select="''"/>
@@ -91,6 +91,6 @@
   
   <tr:remove-ns-decl-and-xml-base name="jats-remove-ns"/>
   
-  <p:delete match="@srcpath" name="jats-remove-srcpath"/>
+  <p:delete match="@srcpath | /*/@source-dir-uri" name="jats-remove-srcpath"/>
   
 </p:declare-step>
