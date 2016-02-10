@@ -21,6 +21,7 @@
     <reserved name="xpl"/>
     <reserved name="xsl"/>
     <clade role="publisher" name="ulsp">
+      <param name="rule-category-span-class" value="category"/>
       <param name="publisher-prefix-for-style-mapping" value="ulsp"/> 
       <clade role="journal" name="CSMI">
         <content role="ms" name-regex="^CSMI_\d{4}_\d{3}\p{L}?$"/><!-- YYYY_MSN -->
