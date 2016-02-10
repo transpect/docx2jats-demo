@@ -1,0 +1,41 @@
+.inline-title{
+  margin-right: 20px;
+  font-style: italic;
+  color: gray;
+  margin-left: 0;
+}
+
+#article-meta{
+  background-color: #ecfbeb;
+  padding: 2%;
+}
+
+.addr-line, .email{
+  margin-left: 60px;
+}
+
+.BC_fallback
+{
+  background-color: lightgray;
+}
+
+p.author a
+{
+  vertical-align: super;
+}
+
+.label
+{
+  color: #333 !important;
+}
+
+ol, ul 
+{
+  margin-left: 40px !important;
+  list-style: initial !important;
+}
+
+table 
+{
+  border: 1px !important;
+}

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://purl.oclc.org/dsdl/schematron" 
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  queryBinding="xslt2">
+  
+  <ns prefix="css" uri="http://www.w3.org/1996/css"/>
+  <ns prefix="xlink" uri="http://www.w3.org/1999/xlink" />
+  
+  <let name="base-dir" value="/*/@source-dir-uri"/>
+  <let name="base-name" value="replace($base-dir, '^.+/(.+?)(\..+)$', '$1')"/>
+  
+  <xsl:function name="css:int-to-hex" as="xs:string">
+    <xsl:param name="int" as="xs:integer"/>
+    <xsl:sequence
+      select="if ($int eq 0) 
+      then '0' 
+      else concat(  if ($int gt 16)
+      then css:int-to-hex($int idiv 16)
+      else '',
+      substring('0123456789ABCDEF', ($int mod 16) + 1, 1)
+      )"/>
+  </xsl:function>
+  
+  <xsl:function name="css:char-replace" exclude-result-prefixes="#all" as="xs:string*">
+    <xsl:param name="text"/>
+    <xsl:variable name="char" select="substring($text,1,1)"/>
+    <xsl:variable name="hex" select="concat('[U+', css:int-to-hex(xs:integer(string-to-codepoints($char))), ']')"/>
+    <xsl:sequence select="$hex"/>
+    <xsl:if test="string-length($text) gt 1">
+      <xsl:sequence select="css:char-replace(substring($text,2))"/>
+    </xsl:if>
+  </xsl:function>
+  
+  <xsl:key name="xlink:crossref-by-rid" match="*" use="@id"/>
+  
+  <pattern id="styledcontent">
+    <rule context="styled-content">
+      <let name="srcpath" value="(@srcpath, .//@srcpath[1], ancestor::*[@srcpath][1]/@srcpath)[1]"/>
+      <report id="styled-content" test="exists(.)" role="Warning"
+        diagnostics="styled-content_de">
+        <span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+        styled-content at '<xsl:value-of select="text()"/>'
+        PMC does not guarantee that the display specified in the attributes will be implemented on the HTML rendering of the article and strongly discourages using this element. Please check the docx if characterstyles besides of bold, italic and underline are used. 
+      </report>
+    </rule>
+  </pattern>
+  
+  <pattern id="required_metainformation">
+    <rule context="*[ancestor::front and not(//text())]">
+      <let name="srcpath" value="(@srcpath, .//@srcpath[1], ancestor::*[@srcpath][1]/@srcpath)[1]"/>
+      <report id="required_meta" test="not(matches(local-name(), 'xref'))" role="Warning"
+        diagnostics="required_meta_de">
+        <span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+        Required Meta-Information is incomplete. <xsl:value-of select="local-name()"></xsl:value-of>
+      </report>
+    </rule>
+  </pattern>
+  
+  <pattern id="fig_format">
+    <rule context="graphic">
+      <let name="srcpath" value="(@srcpath, .//@srcpath[1], ancestor::*[@srcpath][1]/@srcpath)[1]"/>
+      <report id="figure_format" test="not(matches(@xlink:href, '\w*.tiff?'))" role="Warning"
+        diagnostics="figure_format_de">
+        <span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+        This Figure is not in tiff/tif format. Please change<xsl:value-of select="."></xsl:value-of>
+      </report>
+    </rule>
+  </pattern>
+
+  <pattern id="xref_id">
+    <rule context="xref">
+      <let name="srcpath" value="(@srcpath, .//@srcpath[1], ancestor::*[@srcpath][1]/@srcpath)[1]"/>
+      <report id="wrong_xref_id" test="matches(@rid, '\.')" role="Warning"
+        diagnostics="wrong_xref_id_de">
+        <span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+        This link propably don't work because of a wrong character in it's rid: '<xsl:value-of select="@rid"/>' . Please check your docx if the ' <xsl:value-of select="@ref-type"/>' characterstyle is applied only to the reference (not at following interpunctation).
+      </report>
+    </rule>
+  </pattern>
+  
+  <pattern id="hobots_info">
+    <rule context="book">
+      <report test="not(.//*[target[matches(@id, '^(cell)?page_')]])" role="Info" id="no_page_anchors" diagnostics="no_page_anchors_de">
+        <span class="srcpath">BC_orphans</span>
+        If a pagemap equal to the print product is wanted, page anchors are needed. Use the <a xmlns="http://www.w3.org/1999/xhtml" href="https://redmine.le-tex.de/projects/hogrefe-transpect/wiki/Skripte#XML-Skript-PageNamesToStoryALLjsx">script</a> for conditional text page anchors.</report>
+      <report test=".//*[target[matches(@id, '^(cell)?page_')]]" role="Info" id="page_anchor_number" diagnostics="page_anchor_number_de">
+        <span class="srcpath"><xsl:value-of select="$base-dir"/></span>
+        Number of different page anchors in document with Arabic numbering: <br xmlns="http://www.w3.org/1999/xhtml"/>
+        <xsl:value-of select="count(
+                                    distinct-values(
+                                        for $i in .//target[matches(@id, '^(cell)?page_\d')] return 
+                                            replace($i[matches(@id, '^(cell)?page_')]/@id, '^(cell)?page_(.+?)(_.+)?$', '$2')
+                                    )
+                              )"/>. 
+        Those are generated via the »PageNamesToStory« script and used to keep 
+        the print edition's for EPUB.
+        <xsl:if test="some $a in .//target/@id satisfies matches($a, '^(cell)?page_\D')">
+          <br xmlns="http://www.w3.org/1999/xhtml"/>
+          Amount of page anchors with Roman numbering: 
+          <xsl:value-of select="count(
+                                 distinct-values(
+                                  for $i in .//target[matches(@id, '^(cell)?page_\D')] return 
+                                    replace($i[matches(@id, '^(cell)?page_\D')]/@id, '^(cell)?page_(.+?)(_.+)?$', '$2')
+                                 )
+                                )"/>
+          <br xmlns="http://www.w3.org/1999/xhtml"/>
+          [<xsl:value-of select="string-join(distinct-values(for $i in .//target[matches(@id, '^(cell)?page_\D')] return replace($i[matches(@id, '^(cell)?page_\D')]/@id, '^(cell)?page_(.+?)(_.+)?$', '$2')), ', ')"/>]
+        </xsl:if>
+        <xsl:if test="some $a in .//target satisfies $a[matches(@id, '^(cell)?page_[^_]+$')][following-sibling::*[1][self::target][matches(@id, '^(cell)?page_')][replace(@id, '^(cell)?page_(.+?)(_.+)?$', '$2') ne replace(current()/@id, '^(cell)?page_(.+?)(_.+)?$', '$2')]]">
+          <br xmlns="http://www.w3.org/1999/xhtml"/>
+          Possible anchors on blankpages that will be discarded: 
+          <xsl:value-of select="count(
+            distinct-values(
+            for $i in .//target[matches(@id, '^(cell)?page_[^_]+$')][following-sibling::*[1][self::target][matches(@id, '^(cell)?page_')][replace(@id, '^(cell)?page_(.+?)(_.+)?$', '$2') ne replace(current()/@id, '^(cell)?page_(.+?)(_.+)?$', '$2')]] return 
+            replace($i[matches(@id, '^(cell)?page_')]/@id, '^(cell)?page_(.+?)(_.+)?$', '$2')
+            )
+            )"/>
+          <br xmlns="http://www.w3.org/1999/xhtml"/>
+          [<xsl:value-of select="string-join(distinct-values(
+            for $i in .//target[matches(@id, '^(cell)?page_[^_]+$')][following-sibling::*[1][self::target][matches(@id, '^(cell)?page_')][replace(@id, '^(cell)?page_(.+?)(_.+)?$', '$2') ne replace(current()/@id, '^(cell)?page_(.+?)(_.+)?$', '$2')]] return 
+            replace($i[matches(@id, '^(cell)?page_')]/@id, '^(cell)?page_(.+?)(_.+)?$', '$2')
+            ) , ', ')"/>]
+        </xsl:if>
+      </report>
+    </rule>
+  </pattern>  
+  
+  <diagnostics>
+    <diagnostic id="page_anchor_number_de" xml:lang="de">
+      Anzahl der unterschiedlichen Seitenanker im Dokument mit arabischer Zählung: <br xmlns="http://www.w3.org/1999/xhtml"/>
+      »<xsl:value-of select="count(
+                                distinct-values(
+                                   for $i in .//target[matches(@id, '^(cell)?page_\d')] return 
+                                      replace($i[matches(@id, '^(cell)?page_\d')]/@id, '^(cell)?page_(.+?)(_.+)?$', '$2')
+                                )
+                             )"/>«.<br xmlns="http://www.w3.org/1999/xhtml"/> 
+      Diese wurden durch das »PageNamesToStory«-Skript generiert
+      und dienen der Übernahme der Printseitenzahlen ins EPUB.
+      <xsl:if test="some $a in .//target/@id satisfies matches($a, '^(cell)?page_\D')">
+        <br xmlns="http://www.w3.org/1999/xhtml"/>
+        Seitenanker mit römischer Zähung: 
+        »<xsl:value-of select="count(
+                               distinct-values(
+                                for $i in .//target[matches(@id, '^(cell)?page_\D')] return 
+                                  replace($i[matches(@id, '^(cell)?page_\D')]/@id, '^(cell)?page_(.+?)(_.+)?$', '$2')
+                               )
+                              )"/>«.
+      </xsl:if>
+      <xsl:if test="some $a in .//target satisfies $a[matches(@id, '^(cell)?page_[^_]+$')][following-sibling::node()[1][self::target][matches(@id, '^(cell)?page_')][replace(@id, '^(cell)?page_(.+?)(_.+)?$', '$2') ne replace(current()/@id, '^(cell)?page_(.+?)(_.+)?$', '$2')]]">
+        <br xmlns="http://www.w3.org/1999/xhtml"/>
+        Mögliches Vakatenseitenanker, die entfernt werden: 
+        <xsl:value-of select="count(
+          distinct-values(
+          for $i in .//target[matches(@id, '^(cell)?page_[^_]+$')][following-sibling::node()[1][self::target][matches(@id, '^(cell)?page_')][replace(@id, '^(cell)?page_(.+?)(_.+)?$', '$2') ne replace(current()/@id, '^(cell)?page_(.+?)(_.+)?$', '$2')]] return 
+          replace($i[matches(@id, '^(cell)?page_')]/@id, '^(cell)?page_(.+?)(_.+)?$', '$2')
+          )
+          )"/>
+        <br xmlns="http://www.w3.org/1999/xhtml"/>
+        [<xsl:value-of select="string-join(distinct-values(
+          for $i in .//target[matches(@id, '^(cell)?page_[^_]+$')][following-sibling::node()[1][self::target][matches(@id, '^(cell)?page_')][replace(@id, '^(cell)?page_(.+?)(_.+)?$', '$2') ne replace(current()/@id, '^(cell)?page_(.+?)(_.+)?$', '$2')]] return 
+          replace($i[matches(@id, '^(cell)?page_')]/@id, '^(cell)?page_(.+?)(_.+)?$', '$2')
+          ) , ', ')"/>]
+      </xsl:if>
+    </diagnostic>
+    <diagnostic id="no_page_anchors_de" xml:lang="de">
+      Es existieren keine Seitenanker. Wenn im EPUB eine Pagemap erstellt werden soll, die mit den Seitenzahlen des Printproduktes übereistimmt,
+      müssen die Seitenanker eingefügt werden. Dazu kann ein <a xmlns="http://www.w3.org/1999/xhtml" href="https://redmine.le-tex.de/projects/hogrefe-transpect/wiki/Skripte#XML-Skript-PageNamesToStoryALLjsx">Paginierungsskript</a> benutzt werden.
+    </diagnostic>
+    <diagnostic id="required_meta_de" xml:lang="de">
+    obligatorische Metainformationen fehlen.      
+    </diagnostic>
+    <diagnostic id="figure_format_de" xml:lang="de">
+      Format der eingebundenen Grafik ist nicht tiff bzw. tif.
+    </diagnostic>
+    <diagnostic id="styled-content_de" xml:lang="de">
+      styled-content-Element um: '<xsl:value-of select="text()"/>
+      PMC rät von der Verwendung von styled-content-Elementen ab, da dessen korrekte Darstellung im HTML Rendering nicht garantiert werden können. Ursache könnte ein im DOCX verwendeter Zeichenstil (außer fett, kursiv und unterstrichen) sein. 
+    </diagnostic>
+    <diagnostic id="wrong_xref_id_de" xml:lang="de">
+        Dieser Link funktioniert wahrscheinlich nicht, weil seine RID (<xsl:value-of select="@rid"/> ) falsch berechnet wurde. Ursache könnte sein, dass im DOCX der Zeichenstil für diesen '<xsl:value-of select="@ref-type"/>' Querverweis auf eine folgende Interpunktion mit angewendet wurde.
+    </diagnostic>
+  </diagnostics>
+
+</schema>

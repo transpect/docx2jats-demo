@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://purl.oclc.org/dsdl/schematron" 
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  queryBinding="xslt2">
+
+  <ns prefix="idml2xml" uri="http://www.le-tex.de/namespace/idml2xml" />
+  <ns prefix="dbk" uri="http://docbook.org/ns/docbook" />
+  <ns prefix="css" uri="http://www.w3.org/1996/css"/>
+  <ns prefix="xlink" uri="http://www.w3.org/1999/xlink" />
+  <ns prefix="transpect" uri="http://www.le-tex.de/namespace/transpect" />
+  
+  <let name="base-dir" value="/*/dbk:info/dbk:keywordset[@role eq 'hub']/dbk:keyword[@role eq 'source-dir-uri']"/>
+  <xsl:key name="transpect:style-by-type" match="css:rule" use="@name" />
+  <xsl:template name="transpect:role-for-schematron" as="xs:string*">
+    <xsl:param name="role"/>
+    <xsl:value-of select="replace(replace(key('transpect:style-by-type', current()/$role)[1]/@native-name, '(_-_|[~&#x2dc;]).+$', ''), ':', '/')"/>
+  </xsl:template>
+  
+  <pattern id="evolve-hub_common_01">  
+    <rule context="dbk:para[dbk:informaltable]">
+      <let name="srcpath" value="(@srcpath, ancestor::*[@srcpath][1]/@srcpath, .//@srcpath[1])[1]"/>
+      <assert test="every $n in node() satisfies ($n/(
+                                                        self::dbk:informaltable 
+                                                      | self::text()[matches(., '^\s*$')]
+                                                      | self::dbk:anchor[matches(@xml:id, '^page(end)?_')]
+                                                      )
+                                                  )" id="text_around_table" role="warning"
+        diagnostics="text_around_table_de">
+        <span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+        Unless it is a proper inline table, a table should have no other text around it (in the same paragraph). Found:
+        '<value-of select="count(node()[not(self::dbk:informaltable)]), ';;', node()[not(self::dbk:informaltable)]/name(), '::',string-join(node()[not(self::dbk:informaltable)]/descendant-or-self::text(), '')"/>'.
+      </assert>
+    </rule>
+  </pattern>
+
+  <pattern id="article">
+    <rule context="/*">
+      <let name="srcpath" value="(@srcpath, ancestor::*[@srcpath][1]/@srcpath, .//@srcpath[1])[1]"/>
+      <assert test="dbk:section | dbk:info" 
+        id="no_article_mainmatter" role="error" diagnostics="no_article_mainmatter_de">
+        <span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+        There must be at least a info part or a section heading. Please use either of these styles
+        on at least one paragraph.</assert>
+    </rule>    
+  </pattern>
+
+  <pattern id="evolve_pseudo-heading">
+    <rule context="dbk:title">
+      <let name="srcpath" value="(@srcpath, ancestor::*[@srcpath][1]/@srcpath, .//@srcpath[1])[1]"/>
+      <report test="matches(., '^\s*$')" 
+        id="empty_heading" role="warning" diagnostics="empty_heading_de">
+        <span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+        Empty heading? Style: »<xsl:call-template name="transpect:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>«</report>
+    </rule>    
+  </pattern>
+
+  
+  <pattern>
+    <rule context="dbk:para[matches(@role, 'tabletitle')]">
+      <let name="srcpath" value="(dbk:title/@srcpath, ancestor::*[@srcpath][1]/@srcpath, .//@srcpath[1])[1]"/>
+      <report test="exists(.)" id="wrong_tabletitle_position"
+        diagnostics="wrong_tabletitle_position_de" role="error">
+        <span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+        This tabletitle is not properly placed. Please place the title always above the table.
+      </report>
+    </rule>
+  </pattern>
+  
+  <pattern id="empty_para">
+    <rule context="dbk:para[@role]">
+      <let name="srcpath" value="(@srcpath, .//@srcpath[1], ancestor::*[@srcpath][1]/@srcpath)[1]"/>
+      <report id="empty_p" test="self::*[not(normalize-space())][not(matches(@role, 'figure|table'))][not(parent::entry)]" role="Warning"
+        diagnostics="empty_p_de">
+        <span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+        There is an empty paragraph with following style applied: <xsl:value-of select="@role"/>
+      </report>
+    </rule>
+  </pattern>
+  
+  <diagnostics>
+    <diagnostic id="empty_heading_de" xml:lang="de">
+      Leere Überschrift? Formatname: »<xsl:call-template name="transpect:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>«
+    </diagnostic>
+    <diagnostic id="no_article_mainmatter_de" xml:lang="de">
+      Es muss mindestens eine 'section' oder ein 'info' Part vorkommen. Dies ist nicht der Fall. 
+      Der Grund ist wahrscheinlich, dass nicht die entspr. Formatvorlage Headline-2(~rule) 
+      vorkam. Bitte verwenden Sie die entspr. Absatzformatvorlagen
+      zumindest für einen Absatz.</diagnostic>
+    <diagnostic id="text_around_table_de" xml:lang="de">
+      In diesem Absatz steht eine Tabelle <b xmlns="http://www.w3.org/1999/xhtml">und</b> Text. <br xmlns="http://www.w3.org/1999/xhtml"/>
+      Wenn es nicht eine echte einzeilige Tabelle ist, sollte eine Tabelle in einem Absatz für sich allein stehen, ohne Text drumherum. 
+      <br xmlns="http://www.w3.org/1999/xhtml"/>Gefundener Text:
+      '<value-of select="string-join(node()[not(self::dbk:informaltable)]/descendant-or-self::text(), '')"/>'.
+    </diagnostic>
+    <diagnostic id="wrong_tabletitle_position_de">
+      Der Tabellentitel ist falsch positioniert, dieser sollte sich immer über der Tabelle befinden.
+    </diagnostic>
+    <diagnostic id="empty_p_de">
+      Hier befindet sich ein leerer Absatz mit folgender Formatvorlage: <xsl:value-of select="@role"/>
+    </diagnostic>
+  </diagnostics>
+</schema>
