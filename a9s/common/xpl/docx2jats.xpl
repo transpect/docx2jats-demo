@@ -51,7 +51,8 @@
   <p:import href="http://transpect.io/cascade/xpl/load-cascaded.xpl"/>
   <p:import href="http://transpect.io/epubcheck-idpf/xpl/epubcheck.xpl"/>
   <p:import href="http://transpect.io/epubtools/xpl/epub-convert.xpl"/>
-  
+  <p:import href="http://transpect.io/nlm-stylechecker/xpl/nlm-stylechecker.xpl"/>  
+
   <p:load>
     <p:with-option name="href" select="/tr:conf/@paths-xsl-uri">
       <p:pipe port="conf" step="docx2epub"/>
@@ -160,7 +161,21 @@
     <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
   </jats:hub2bits>
 
+  <tr:nlm-stylechecker name="nlm-stylecheck">
+    <p:input port="parameters">
+      <p:empty/>
+    </p:input>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+  </tr:nlm-stylechecker>
+
+  <p:sink/>
+
   <tr:validate-with-schematron name="sch_jats">
+    <p:input port="source">
+      <p:pipe port="result" step="hub2jats"/>
+    </p:input>
     <p:input port="html-in">
       <p:empty/>
     </p:input>
@@ -280,6 +295,7 @@
       <p:pipe port="report" step="rng"/>
       <p:pipe port="report" step="epub-convert"/>
       <p:pipe port="result" step="epubcheck"/>
+      <p:pipe port="report" step="nlm-stylecheck"/>
     </p:input>
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>

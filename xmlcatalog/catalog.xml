@@ -20,6 +20,7 @@
   <nextCatalog catalog="../epubtools/xmlcatalog/catalog.xml"/>
   <nextCatalog catalog="../epubcheck-idpf/xmlcatalog/catalog.xml"/>
   <nextCatalog catalog="../css-tools/xmlcatalog/catalog.xml"/>
+  <nextCatalog catalog="../nlm-stylechecker/xmlcatalog/catalog.xml"/>
   
   <nextCatalog catalog="content-repo.catalog.xml"/>
   <nextCatalog catalog="content-repo.default.catalog.xml"/>

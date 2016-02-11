@@ -55,3 +55,6 @@
 [submodule "css-tools"]
 	path = css-tools
 	url = https://github.com/transpect/css-tools.git
+[submodule "nlm-stylechecker"]
+	path = nlm-stylechecker
+	url = https://github.com/transpect/nlm-stylechecker.git
