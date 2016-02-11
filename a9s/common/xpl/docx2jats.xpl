@@ -17,7 +17,7 @@
 
   <p:output port="result" primary="true">
     <p:documentation>JATS</p:documentation>
-    <p:pipe port="result" step="jats-remove-ns"/>
+    <p:pipe port="result" step="jats-remove-srcpath"/>
   </p:output>
   <p:serialization port="result" indent="true" omit-xml-declaration="false"/>
 
@@ -45,6 +45,7 @@
   <p:import href="http://transpect.io/htmlreports/xpl/check-styles.xpl"/>
   <p:import href="http://transpect.io/htmlreports/xpl/validate-with-schematron.xpl"/>
   <p:import href="http://transpect.io/htmlreports/xpl/validate-with-rng.xpl"/>
+  <p:import href="http://transpect.io/map-style-names/xpl/map-style-names.xpl"/>
   
   <p:load>
     <p:with-option name="href" select="/tr:conf/@paths-xsl-uri">
@@ -71,6 +72,21 @@
     <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
     <p:with-option name="docx" select="$file"/>
   </docx2hub:convert>
+  
+  <css:map-styles name="map-styles">
+    <p:input port="source">
+      <p:pipe port="result" step="docx2hub"/>
+    </p:input>
+    <p:input port="paths">
+      <p:pipe port="result" step="paths"/>
+    </p:input>
+    <p:with-option name="map-name" select="concat('styles/map-', /c:param-set/c:param[@name eq 'ext']/@value, '.xhtml')">
+      <p:pipe port="result" step="paths"/>
+    </p:with-option>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+  </css:map-styles>
   
   <tr:check-styles name="check-styles">
     <p:input port="html-in">

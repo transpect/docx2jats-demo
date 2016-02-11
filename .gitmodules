@@ -46,3 +46,9 @@
 [submodule "epubcheck-idpf"]
 	path = epubcheck-idpf
 	url = https://github.com/transpect/epubcheck-idpf.git
+[submodule "transpectdoc"]
+	path = transpectdoc
+	url = https://github.com/transpect/transpectdoc.git
+[submodule "map-style-names"]
+	path = map-style-names
+	url = https://github.com/transpect/map-style-names.git

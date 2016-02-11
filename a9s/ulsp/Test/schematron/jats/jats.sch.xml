@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://purl.oclc.org/dsdl/schematron" 
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  queryBinding="xslt2">
+  
+  <ns prefix="css" uri="http://www.w3.org/1996/css"/>
+  <ns prefix="xlink" uri="http://www.w3.org/1999/xlink" />
+  
+  <let name="base-dir" value="/*/@source-dir-uri"/>
+  
+  <pattern id="author-rejected">
+    <rule context="contrib-group/contrib/name">
+      <let name="srcpath" value="(@srcpath, .//@srcpath[1], ancestor::*[@srcpath][1]/@srcpath)[1]"/>
+      <report id="the-notorious-dr-falz" 
+              test="surname = 'Falz' and matches(given-names, '^R(oberto|\.)?$')" 
+              role="error"
+              diagnostics="the-notorious-dr-falz_de">
+        <span class="srcpath"><xsl:value-of select="string-join(
+                                                      for $s in tokenize($srcpath, '\s+') 
+                                                      return concat($base-dir, $s), 
+                                                      ' '
+                                                    )"/></span>
+        Dr. Roberto Falz is banned from publishing in this journal!
+      </report>
+    </rule>
+  </pattern>
+
+  <diagnostics>
+    <diagnostic id="the-notorious-dr-falz_de" 
+                xml:lang="de">Dr. Roberto Falz darf bei dieser Zeitschrift nicht veröffentlichen!</diagnostic>
+  </diagnostics>
+
+</schema>
