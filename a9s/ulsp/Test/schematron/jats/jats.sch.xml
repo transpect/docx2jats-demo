@@ -20,7 +20,7 @@
                                                       return concat($base-dir, $s), 
                                                       ' '
                                                     )"/></span>
-        Dr. Roberto Falz is banned from publishing in this journal!
+        This author is banned from publishing in this journal!
       </report>
     </rule>
   </pattern>

@@ -17,6 +17,9 @@
   <nextCatalog catalog="../xslt-util/xmlcatalog/catalog.xml"/>
   <nextCatalog catalog="../docx2hub/xmlcatalog/catalog.xml"/>
   <nextCatalog catalog="../map-style-names/xmlcatalog/catalog.xml"/>
+  <nextCatalog catalog="../epubtools/xmlcatalog/catalog.xml"/>
+  <nextCatalog catalog="../epubcheck-idpf/xmlcatalog/catalog.xml"/>
+  <nextCatalog catalog="../css-tools/xmlcatalog/catalog.xml"/>
   
   <nextCatalog catalog="content-repo.catalog.xml"/>
   <nextCatalog catalog="content-repo.default.catalog.xml"/>

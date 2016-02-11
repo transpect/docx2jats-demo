@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epub-config format="EPUB3" indent="selective" html-subdir-name="html">
+<!--   <cover svg="true" href="file:///C:/Users/gerrit/tmp/3293390005.jpg"/>-->
+   <types xmlns:tr="http://transpect.io"
+          xml:base="file:/C:/cygwin/home/gerrit/Unionsverlag/transpect_github/a9s/common/epubtools/epub-types.xml">
+      <type name="toc"
+            heading="Inhaltsverzeichnis"
+            fallback-id-for-landmark="tei2html_rendered_toc"
+            hidden="true"/>
+      <type name="landmarks" heading="Übersicht" hidden="true"/>
+      <type name="cover" heading="Cover" file="cover"/>
+      <type name="titlepage" heading="Titelei" file="titlepage"/>
+      <type name="frontmatter" heading="Vorspann"/>
+      <type name="bodymatter" heading="Hauptteil"/>
+      <type name="backmatter" heading="Anhang"/>
+      <type name="acknowledgments" heading="Danksagung"/>
+      <type name="glossary" heading="Glossar"/>
+      <type name="index" heading="Register"/>
+      <type name="preface" heading="Vorwort"/>
+      <type name="loi" heading="Abbildungsverzeichnis" file="list-of-figures"/>
+      <type name="lot" heading="Tabellenverzeichnis" file="list-of-tables"/>
+      <type name="tr:bio" file="author"/>
+      <type name="tr:about-the-book" file="about-the-book"/>
+      <type name="abstract" file="about-the-content"/>
+      <type name="fulltitle" file="title"/>
+      <type name="copyright-page" file="copyright"/>
+      <type name="part" file="part"/>
+      <type name="chapter" file="chapter"/>
+      <type name="appendix" file="appendix"/>
+      <type name="glossary" file="glossary"/>
+      <type name="other-credits" file="other-credits"/>
+      <type name="tr:popup" file="popup"/>
+      <type name="tr:advertisement" file="advertisement"/>
+   </types>
+   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+      <dc:identifier>9783293390003</dc:identifier>
+      <dc:title>Transpect-DOCX</dc:title>
+      <dc:creator>Peter Muster und Jo Sample</dc:creator>
+      <dc:publisher>Unionsverlag</dc:publisher>
+      <dc:date>2016</dc:date>
+      <dc:language>de</dc:language>
+      <dc:subject>Deutschland</dc:subject>
+      <dc:subject>Frauen</dc:subject>
+      <dc:subject>Liebe</dc:subject>
+      <dc:subject>Österreich</dc:subject>
+      <dc:subject>Piotr Müstèr</dc:subject>
+      <dc:subject>Schweiz</dc:subject>
+      <dc:subject>Software</dc:subject>
+      <dc:description>Dieses Werk ist gleichzeitig Test-, Muster- und Handbuch für alle, die aus DOCX ein E-Book generieren wollen. Beginnend mit einfachen Formatierungen, schreitet es voran zu komplexen Gestaltungen und zeigt die vielfältigen Möglichkeiten, ein wohlgeformtes E-Book sicher zu produzieren. Es baut auf dem vordefinierten Formatvorlagen-Katalog auf, nutzt eine eigene hilfreiche Tastaturdefinition und dokumentiert die zugehörige Makro-Bibliothek. Mit Hintersinn und Hinterlist stellt es dem Konverter allerlei Fallen. Wenn daraus ein valables E-Book entsteht, kann man sich auf den Konverter verlassen.</dc:description>
+   </metadata>
+   <checks xmlns:dc="http://purl.org/dc/elements/1.1/">
+      <check param="image-max-mb" value="0.8" severity="warning"/>
+      <check param="image-max-mpx" value="2.4" severity="warning"/>
+      <check param="image-max-mb" value="10.0" severity="error"/>
+      <check param="image-max-mpx" value="3.8" severity="error"/>
+      <check param="result-max-mb" value="15" severity="warning"/>
+   </checks>
+   <hierarchy xml:base="file:/C:/cygwin/home/gerrit/Unionsverlag/transpect_github/a9s/unionsverlag/epubtools/heading-conf.xml"
+              media-type="application/xhtml+xml"
+              max-population="40"
+              max-text-length="235000"
+              generated-frontmatter-title="">
+      <unconditional-split elt="div" attr="class" attval="split"/>
+      <unconditional-split elt="p" attr="class" attval="h1-repeat"/>
+      <unconditional-split elt="h2" attr="class" attval="section"/>
+      <unconditional-split elt="h1" attr="class" attval="sys"/>
+      <unconditional-split elt="h1" attr="class" attval="split"/>
+      <unconditional-split elt="h2" attr="class" attval="split"/>
+      <unconditional-split elt="h2" attr="class" attval="sys"/>
+      <unconditional-split elt="h2" attr="class" attval="part"/>
+      <unconditional-split elt="div" attr="class" attval="chapter-title-group"/>
+      <unconditional-split elt="div" attr="class" attval="part-title-group"/>
+      <unconditional-split elt="div" attr="class" attval="outro-title-group"/>
+      <unconditional-split elt="div" attr="class" attval="appendix-title-group"/>
+      <unconditional-split elt="div" attr="class" attval="remove" remove="yes"/>
+      <unconditional-split elt="div" attr="class" attval="title-page"/>
+      <unconditional-split elt="div" attr="class" attval="dedication"/>
+      <unconditional-split elt="div" attr="epub:type" attval="letex:motto"/>
+      <unconditional-split elt="div" attr="epub:type" attval="preface"/>
+      <unconditional-split elt="div" attr="class" attval="frontispiz2"/>
+      <unconditional-split elt="div" attr="class" attval="about-contrib"/>
+      <unconditional-split elt="div" attr="class" attval="copyright-page"/>
+      <unconditional-split elt="div" attr="epub:type" attval="pagebreak" remove="yes"/>
+      <conditional-split elt="p" attr="class" attval="paragraphsplitter" nav="no"/>
+      <conditional-split elt="p" attr="class" attval="emptyline" nav="no"/>
+      <heading elt="div" attr="epub:type" attval="cover" level="1"/>
+      <heading elt="h1" level="1"/>
+      <heading elt="h2" level="2"/>
+      <heading elt="h3" level="3"/>
+      <heading elt="h4" level="4"/>
+      <heading elt="h5" level="5"/>  
+   </hierarchy>
+</epub-config>

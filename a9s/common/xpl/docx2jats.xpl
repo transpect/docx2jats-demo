@@ -9,6 +9,8 @@
   xmlns:cx="http://xmlcalabash.com/ns/extensions"
   xmlns:pxp="http://exproc.org/proposed/steps"
   xmlns:hub2htm="http://transpect.io/hub2htm"
+  xmlns:epub="http://transpect.io/epubtools" 
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:hub="http://transpect.io/hub" name="docx2epub" version="1.0">
 
   <p:input port="conf">
@@ -46,6 +48,9 @@
   <p:import href="http://transpect.io/htmlreports/xpl/validate-with-schematron.xpl"/>
   <p:import href="http://transpect.io/htmlreports/xpl/validate-with-rng.xpl"/>
   <p:import href="http://transpect.io/map-style-names/xpl/map-style-names.xpl"/>
+  <p:import href="http://transpect.io/cascade/xpl/load-cascaded.xpl"/>
+  <p:import href="http://transpect.io/epubcheck-idpf/xpl/epubcheck.xpl"/>
+  <p:import href="http://transpect.io/epubtools/xpl/epub-convert.xpl"/>
   
   <p:load>
     <p:with-option name="href" select="/tr:conf/@paths-xsl-uri">
@@ -188,8 +193,64 @@
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
   </jats:html>
+  
+  <p:add-xml-base name="add-xml-base"/>
+  
+  <p:add-attribute name="html-add-xml-base" attribute-name="xml:base" match="/*">
+    <p:with-option name="attribute-value" select="replace(/*/@xml:base, '[.\p{L}]+$', '.xhtml')"/>
+  </p:add-attribute>
+  
+  <tr:store-debug pipeline-step="html-base">
+    <p:with-option name="active" select="$debug"/>
+    <p:with-option name="base-uri" select="$debug-dir-uri"/>
+  </tr:store-debug>
 
-  <p:delete match="@srcpath" name="html-remove-srcpath"/>
+  <p:sink/>
+
+  <tr:load-cascaded filename="epubtools/epub-config.xml">
+    <p:input port="paths">
+      <p:pipe port="result" step="paths"/>
+    </p:input>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+  </tr:load-cascaded>
+  
+  <p:string-replace match="/epub-config/metadata/dc:identifier[1]/text()" name="epub-conf" >
+    <p:with-option name="replace" select="concat('''', /c:param-set/c:param[@name = 'basename']/@value, '''')">
+      <p:pipe port="result" step="paths"/>
+    </p:with-option>
+  </p:string-replace>
+  
+  <p:sink/>
+  
+  <epub:convert name="epub-convert" clean-target-dir="yes" terminate-on-error="no">
+    <p:input port="source">
+      <p:pipe port="result" step="html-add-xml-base"/>
+    </p:input>
+    <p:input port="meta">
+      <p:pipe port="result" step="epub-conf"/>
+    </p:input>
+    <p:input port="conf">
+      <p:empty/>
+    </p:input>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+  </epub:convert>
+
+  <tr:epubcheck-idpf name="epubcheck">
+    <p:with-option name="epubfile-path" select="/*/@os-path"/>
+    <p:with-option name="svrl-srcpath" select="'BC_orphans'"/>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+  </tr:epubcheck-idpf>
+
+  <p:sink/>
+
+  <p:delete match="@srcpath" name="html-remove-srcpath">
+    <p:input port="source">
+      <p:pipe port="html" step="epub-convert"/>
+    </p:input>
+  </p:delete>
   
   <tr:remove-ns-decl-and-xml-base name="html-remove-ns"/>
   
@@ -217,6 +278,8 @@
       <p:pipe port="report" step="check-styles"/>
       <p:pipe port="report" step="sch_jats"/>
       <p:pipe port="report" step="rng"/>
+      <p:pipe port="report" step="epub-convert"/>
+      <p:pipe port="result" step="epubcheck"/>
     </p:input>
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>

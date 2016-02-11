@@ -52,3 +52,6 @@
 [submodule "map-style-names"]
 	path = map-style-names
 	url = https://github.com/transpect/map-style-names.git
+[submodule "css-tools"]
+	path = css-tools
+	url = https://github.com/transpect/css-tools.git
