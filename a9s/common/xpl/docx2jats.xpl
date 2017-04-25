@@ -21,7 +21,9 @@
     <p:documentation>JATS</p:documentation>
     <p:pipe port="result" step="jats-remove-srcpath"/>
   </p:output>
-  <p:serialization port="result" indent="true" omit-xml-declaration="false"/>
+  <p:serialization port="result" indent="true" omit-xml-declaration="false"
+    doctype-public="-//NLM//DTD JATS (Z39.96) Journal Archiving and Interchange DTD v1.0 20120330//EN" 
+    doctype-system="JATS-archivearticle1.dtd"/>
 
   <p:output port="htmlreport" sequence="true">
     <p:pipe port="result" step="htmlreport-remove-ns"/>
