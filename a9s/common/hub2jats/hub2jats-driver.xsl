@@ -583,4 +583,17 @@
   <xsl:template match="dbk:imagedata/@fileref" mode="default">
     <xsl:attribute name="xlink:href" select="."/>
   </xsl:template>
+  
+  <xsl:template match="dbk:equation" mode="default">
+    <disp-formula>
+      <xsl:apply-templates mode="#current"/>
+    </disp-formula>
+  </xsl:template>
+
+  <xsl:template match="dbk:inlineequation" mode="default">
+    <inline-formula>
+      <xsl:apply-templates mode="#current"/>
+    </inline-formula>
+  </xsl:template>
+
   </xsl:stylesheet>
