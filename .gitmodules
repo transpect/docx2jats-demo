@@ -1,6 +1,7 @@
 [submodule "calabash"]
 	path = calabash
 	url = https://github.com/transpect/calabash-frontend.git
+	branch = saxon10
 [submodule "schema/hub"]
 	path = schema/hub
 	url = https://github.com/le-tex/Hub.git
