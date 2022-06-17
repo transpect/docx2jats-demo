@@ -24,4 +24,5 @@
   
   <nextCatalog catalog="content-repo.catalog.xml"/>
   <nextCatalog catalog="content-repo.default.catalog.xml"/>
+  <nextCatalog catalog="../xslt-util/xmlcatalog/transpect.io.catalog.xml"/>
 </catalog>
