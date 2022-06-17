@@ -70,6 +70,9 @@
     <p:input port="conf">
       <p:pipe port="conf" step="docx2epub"/>
     </p:input>
+    <p:input port="params">
+      <p:empty/>
+    </p:input>
   </tr:paths>
 
   <p:sink/>
@@ -190,13 +193,13 @@
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
   </tr:validate-with-schematron>
 
-  <tr:validate-with-rng name="rng">
+  <tr:validate-with-rng-svrl name="rng">
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:input port="schema">
       <p:document href="http://transpect.io/schema/jats/archiving/1.0/rng/JATS-archivearticle1.rng"/>
     </p:input>
-  </tr:validate-with-rng>
+  </tr:validate-with-rng-svrl>
 
   <jats:html name="jats2html">
     <p:input port="paths">
